@@ -26,10 +26,18 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image to DockerHub
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/jrs:latest
 
+      - name: Log in to Alibaba Cloud Registry
+        run: |
+          echo "${{ secrets.ALIYUN_PASSWORD }}" | docker login --username=${{ secrets.ALIYUN_USERNAME }} --password-stdin crpi-e38l2v1is4373ixk.cn-shanghai.personal.cr.aliyuncs.com
+
+      - name: Tag and push image to Alibaba Cloud
+        run: |
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/jrs:latest crpi-e38l2v1is4373ixk.cn-shanghai.personal.cr.aliyuncs.com/${{ secrets.ALIYUN_USERNAME }}/jrs:latest
+          docker push crpi-e38l2v1is4373ixk.cn-shanghai.personal.cr.aliyuncs.com/${{ secrets.ALIYUN_USERNAME }}/jrs:latest
