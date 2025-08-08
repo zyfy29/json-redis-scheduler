@@ -69,33 +69,10 @@ func waitForTriggerTime(triggerTime time.Time) {
 
 	// 待機時間を計算
 	duration := triggerTime.Sub(now)
-	log.Printf("Waiting %v until trigger time (%s)...\n",
-		duration.Round(time.Second), triggerTime.Format(time.RFC3339Nano))
+	log.Printf("Waiting %v until trigger time (%s)...\n", duration.Round(time.Second), triggerTime.Format(time.RFC3339Nano))
 
-	// 長時間の待機の場合は定期的に残り時間を表示
-	if duration > time.Minute {
-		ticker := time.NewTicker(time.Minute)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-time.After(duration):
-				log.Println("Trigger time reached!")
-				return
-			case <-ticker.C:
-				remaining := triggerTime.Sub(time.Now())
-				if remaining <= 0 {
-					log.Println("Trigger time reached!")
-					return
-				}
-				log.Printf("Remaining time: %v\n", remaining.Round(time.Second))
-			}
-		}
-	} else {
-		// 短時間の場合は単純に待機
-		time.Sleep(duration)
-		log.Println("Trigger time reached!")
-	}
+	time.Sleep(duration)
+	log.Printf("Reached trigger time: %s\n", triggerTime.Format(time.RFC3339Nano))
 }
 
 func readJSONFile(filePath string) ([]byte, error) {
